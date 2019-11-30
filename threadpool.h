@@ -98,7 +98,7 @@ void* threadpool<T>::worker(void* arg){
 template<typename T>
 void threadpool<T>::run()
 {
-    //一直运行到线程池对象被销毁
+    //m_stop全局对象用来保证，当线程执行完一个任务队列当中的任务之后仍然能够继续从
     while(!m_stop)
     {   
         //等待当前的对立面有任务
