@@ -60,20 +60,20 @@ class locker
 };
 
 //封装条件变量类
-class locker
+class cond
 {
 private:
     pthread_cond_t  m_cond;
     pthread_mutex_t m_mutex;
 public:
     //创建并初始化条件变量
-    locker(){
+    cond(){
     //此时的构造函数当中，初始化互斥锁和条件变量时可能会出现失败的情况，要及时抛出异常
         pthread_cond_init(&m_cond,NULL);
         pthread_mutex_init(&m_mutex,NULL);
     }
     //销毁条件变量
-    ~locker(){
+    ~cond(){
         pthread_cond_destroy(&m_cond);
         pthread_mutex_destroy(&m_mutex);  
     }

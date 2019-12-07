@@ -35,7 +35,7 @@ template<typename T>
 threadpool<T>::threadpool(int thread_number,int max_requests):m_thread_number(thread_number),m_max_requests(max_requests),
                                                                                                                                         m_threads(NULL),m_stop(false)
 {
-    if(thread_number)<1||max_requests<1)
+    if(thread_number<1||max_requests<1)
         throw std::exception();
     //创建存储线程号的数组
     m_threads = new pthread_t[m_thread_number];
@@ -54,7 +54,7 @@ threadpool<T>::threadpool(int thread_number,int max_requests):m_thread_number(th
         {
         //分离成功的话，则返回值为0
             delete []m_threads;
-            throw std::exception;
+            throw std::exception();
         }
     }
 } 
@@ -75,7 +75,7 @@ bool threadpool<T>::append(T* request)
     m_queuelocker.lock();
     if(m_workqueue.size()>m_max_requests)
     {
-        m_workqueue.unlock();
+        m_queuelocker.unlock();
         return false;
     }
     m_workqueue.push_back(request);
