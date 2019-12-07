@@ -43,6 +43,7 @@ void modfd(int epollfd,int fd,int ev){//重置事件，更改文件描述符，�
     epoll_ctl(epollfd,EPOLL_CTL_MOD,fd,&event);
 }
 
+//类内的静态数据成员类外重新定义以及初始化
 int http_conn :: m_user_count = 0;//用户数量
 int http_conn :: m_epollfd = -1;
 
@@ -54,11 +55,14 @@ void http_conn :: close_conn(bool real_close){
     }
 }
 
+//初始化新连接的描述符，将其加入监听列表当中
+//每个线程只能够处理一个连接，因为其内部值含有有个fd和地址结构
 void http_conn :: init(int sockfd,const sockaddr_in& addr){
     m_sockfd = sockfd;
     m_address = addr;
     //以下两行为了避免TIME_WAIT状态
     int reuse = 1;
+    //设置处于time_wait()状态下的套接字是可重用的来避免问题
     setsockopt(m_sockfd,SOL_SOCKET,SO_REUSEADDR,&reuse,sizeof(reuse));
     addfd(m_epollfd,sockfd,true);
     m_user_count++;
@@ -69,7 +73,7 @@ void http_conn :: init(int sockfd,const sockaddr_in& addr){
 void http_conn::init(){
     m_check_state = CHECK_STATE_REQUESTLINE;
     m_linger = false;
-
+//建立了连接之后，在来初始化当前连接的各种数据成员
     m_method = GET;
     m_url = 0;
     m_version = 0;

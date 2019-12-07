@@ -37,6 +37,7 @@ void show_error(int connfd,const char* info){
     close(connfd);
 }
 
+//主线程当中负责监听，以及将任务添加到任务队列当中
 int main(int argc,char* argv[]){
     if(argc <= 2){//argv[0]可执行文件名/main,argv[1]IP地址，argv[2]是端口号
         printf("usage: %s ip_address port_number\n",basename(argv[0]));//最后一个/的字符串内容
@@ -51,6 +52,8 @@ int main(int argc,char* argv[]){
     //创建线程池
     threadpool<http_conn>* pool = NULL;
     try{//这里的语句有任何异常就执行下面的return
+    //线程池创建完成之后，里面的工作线程就开始等待从
+    //任务队列当中，获取任务并执行
         pool = new threadpool<http_conn>(10);        
     }
     catch(...){
@@ -58,6 +61,7 @@ int main(int argc,char* argv[]){
     }
 
     //预先为每个可能的客户连接分配一个http_conn对象
+    //后期可以考虑使用map来代替，用来节省空间，不用大量分配
     http_conn* users = new http_conn[MAX_FD];
     assert(users);
     int user_count = 0;
@@ -106,7 +110,7 @@ int main(int argc,char* argv[]){
                     show_error(connfd,"Internal server busy");
                     continue;
                 }
-                //初始化客户连接
+                //新的连接则重新分配一个任务对象
                 users[connfd].init(connfd,client_address);
                 printf("sock_close\n");
             }
@@ -118,6 +122,8 @@ int main(int argc,char* argv[]){
             else if(events[i].events & EPOLLIN){
                 //根据读的结果，决定将任务添加到线程池，还是关闭连接
                 if(users[sockfd].read()){
+                //如果当前连接的产生的任务放到任务队列里面
+                //让工作线程去处理
                     pool->append(users + sockfd);
                 }
                 else{
