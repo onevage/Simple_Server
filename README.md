@@ -1,5 +1,3 @@
-# Threadpool
-#通过使用线程间的信号量，互斥锁和条件变量实现的简单线程池。
+# Simple_Server
+ 使用线程池实现的简Web服务器，主线程当中使用epoll来监听所有的描述符，并将工作分给woker线程。
 
-#simple webserver
-#通过使用线程池来实现的简单的web服务器
