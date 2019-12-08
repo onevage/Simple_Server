@@ -39,8 +39,8 @@ public:
      enum LINE_STATUS{LINE_OK = 0,LINE_BAD,LINE_OPEN};
 
 public:
-    http_conn();
-    ~http_conn();
+    http_conn(){}
+    ~http_conn(){}
 
 public:
     void init(int sockfd,const sockaddr_in& addr);//初始化新接受的连接
